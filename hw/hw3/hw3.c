@@ -46,8 +46,9 @@ void bubbleSort(int arr[], int n)
     }
 }
 
-//�Nrow(col)���_�I�M���I��G�i��üg�Jtoken
-//�Ҧp bits = 2 , row 0~1 ,token = 0*
+
+//將row(col)的起點和終點轉二進位並寫入token
+//例如 bits = 2 , row 0~1 ,token = 0*
 void Decimal2Binary(int *S, int *E, int Bits, char *token)
 {
     int S_tmp = *S;
@@ -93,8 +94,8 @@ void Decimal2Binary(int *S, int *E, int Bits, char *token)
     *ptr = '\0';
 }
 
-//�Ntoken��Q�i��üg�Jrow(col)���_�I�M���I
-//�Ҧp bits = 2 , token = 0* ,�_�I = 0,���I = 1
+//將token轉十進位並寫入row(col)的起點和終點
+//例如 bits = 2 , token = 0* ,起點 = 0,終點 = 1
 void Binary2Decimal(char *token, int Bits, int *S, int *E)
 {
     *S = 0;
@@ -118,7 +119,7 @@ void Binary2Decimal(char *token, int Bits, int *S, int *E)
     }
 }
 
-//���otoken
+//取得token
 char *GetToken(char *line, char *token)
 {
     char *ptr = line;
@@ -160,8 +161,8 @@ void SetTable(int LenTable, int Src_Dst_Table[LenTable][LenTable], int Rule_Cnt)
 
 int *Dijkstra(int n_cnt, int G[n_cnt][n_cnt], int Ingress, int Engress, int *length)
 {
-    //Mind[i],�q�_�I��i���̵u�Z��
-    //pred[i],i���e�@��switch��id
+    //Mind[i],從起點到i的最短距離
+    //pred[i],i的前一個switch的id
     int new_seq[n_cnt];
     int old_seq[n_cnt];
     int MinD[n_cnt], pred[n_cnt];
@@ -193,15 +194,16 @@ int *Dijkstra(int n_cnt, int G[n_cnt][n_cnt], int Ingress, int Engress, int *len
         {
             if (!Visited[i])
             {
-                //�Yingress��nextnode���̵u�Z���[�Wnextnode���Ii���Z��
-                //�p��ingress���Ii�̵u�Z���A�h��s
+
+                //若ingress到nextnode的最短距離加上nextnode到點i的距離
+                //小於ingress到點i最短距離，則更新
                 if (mindist + G[nextnode][i] < MinD[i])
                 {
                     MinD[i] = mindist + G[nextnode][i];
                     pred[i] = nextnode;
                 }
-                //�p�G������|�ۦP
-                //�p��hop�A�ñN�u�~switch id �s��}�C
+                //如果兩條路徑相同
+                //計算hop，並將沿途switch id 存到陣列
                 else if (mindist + G[nextnode][i] == MinD[i])
                 {
                     int new_path = nextnode, old_path = pred[i];
@@ -259,7 +261,7 @@ int *Dijkstra(int n_cnt, int G[n_cnt][n_cnt], int Ingress, int Engress, int *len
         printf("\n");
     }
     */
-    //�x�s�qengress��ingress�����|�ä���
+    //儲存從engress到ingress的路徑並反轉
     int *result = malloc(sizeof(int) * n_cnt);
     int tmp;
     int *ptr = result;
@@ -338,7 +340,7 @@ int main()
         ptr = GetToken(ptr, token);
         strcpy(Rule[i].Action, token);
     }
-    //table����
+    //table長度
     int LenTable = pow(2, Bits);
     int *length = malloc(sizeof(int));
     int *Rounting = Dijkstra(Switch_Cnt, Graph, Ingress, Engress, length);
@@ -348,13 +350,13 @@ int main()
     int change;
     int cnt;
     float Max_Utinity, utinity, Internal, Overlap;
-    //�ncover��row(col)���_�I���I
+    //要cover的row(col)的起點終點
     int *S_row = malloc(sizeof(int));
     int *E_row = malloc(sizeof(int));
     int *S_col = malloc(sizeof(int));
     int *E_col = malloc(sizeof(int));
-    //visted�s�C��rule���X�{����
-    //cover�srule�����A
+    //visted存每個rule的出現次數
+    //cover存rule的狀態
     //internal 1
     //overlap 0
     //outside -1
@@ -418,7 +420,7 @@ int main()
             }
             printf("\n");
         }
-        ���ͤU�C���G
+        產生下列結果
         1 6 6 3
         1 6 2 2
         5 5 6 3
@@ -430,7 +432,7 @@ int main()
         {
             for (int j = 1; j <= LenTable; j *= 2)
             {
-                //k l �ΦP�@�ӮعM�����table
+                //k l 用同一個框遍歷整個table
                 for (int k = 0; k < LenTable; k += i)
                 {
                     for (int l = 0; l < LenTable; l += j)
@@ -439,7 +441,7 @@ int main()
                         Internal = 0;
                         Overlap = 0;
                         int m, n;
-                        //m n �M���ؤ�
+                        //m n 遍歷框內
                         for (m = 0; m < i; m++)
                         {
                             for (n = 0; n < j; n++)
@@ -448,7 +450,7 @@ int main()
                                 Visited[Src_Dst_Table[k + m][l + n] - 1]++;
                             }
                         }
-                        //internal �M overlap
+                        //internal 和 overlap
                         for (int x = 0; x < Rule_Cnt; x++)
                         {
                             if (Visited[x] != 0)
@@ -465,8 +467,8 @@ int main()
                         //printf("%f\t%f\t%f\n",Internal - 1,Overlap + 1,utinity);
                         if (utinity >= Max_Utinity && utinity > 0)
                         {
-                            //IDs �ؤ����X��internal rule
-                            //inner �ؤ����X��rule
+                            //IDs 框內有幾個internal rule
+                            //inner 框內有幾個rule
                             change = 0;
                             IDs = 0;
                             area = m * n;
@@ -478,7 +480,7 @@ int main()
                                 if (Visited[x] == Rule[x].Total)
                                     seq[IDs++] = x + 1;
                             }
-                            //�YSwitch�e�q��
+                            //若Switch容量夠
                             if (inner <= Switch[*Rounting].Capacity)
                             {
                                 if (utinity > Max_Utinity)
@@ -557,7 +559,7 @@ int main()
             Decimal2Binary(S_row, E_row, Bits, Rule_tmp[0].Src);
             Decimal2Binary(S_col, E_col, Bits, Rule_tmp[0].Dst);
             strcpy(Rule_tmp[0].Action, "Fwd");
-            //rule��row(col)�W�X�خءA�hprint�خت��_�I�M���I
+            //rule的row(col)超出框框，則print框框的起點和終點
             for (int i = 0; i < Rule_Cnt; i++)
             {
                 if (Cover[i] != -1)
@@ -591,7 +593,7 @@ int main()
                 printf("%s %s %s\n",Rule[i].Src,Rule[i].Dst,Rule[i].Action);
             }
             */
-            //���ͤU�@����table�Acover = 1(internal)�|�h��
+            //產生下一次的table，cover = 1(internal)會去掉
             for (int i = 0, j = 1; i < Rule_Cnt; i++)
             {
                 if (Cover[i] != 1)
